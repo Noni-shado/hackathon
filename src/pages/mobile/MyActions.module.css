@@ -1,0 +1,174 @@
+.container {
+  padding: var(--spacing-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-4);
+}
+
+.count {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+}
+
+.refreshButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  color: var(--color-gray-600);
+  cursor: pointer;
+}
+
+.refreshButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error {
+  padding: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+  background-color: var(--color-error-light);
+  color: var(--color-error);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.loading,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-12);
+  color: var(--color-gray-400);
+  text-align: center;
+}
+
+.loading p,
+.empty p {
+  margin: var(--spacing-3) 0 0 0;
+  font-size: var(--font-size-sm);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-gray-200);
+  border-top-color: var(--edf-orange);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--color-gray-50);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.badge {
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+}
+
+.blue {
+  background-color: rgba(0, 85, 164, 0.1);
+  color: var(--edf-blue);
+}
+
+.orange {
+  background-color: rgba(255, 107, 0, 0.1);
+  color: var(--edf-orange);
+}
+
+.green {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.red {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+}
+
+.gray {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
+.date {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+}
+
+.cardBody {
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+}
+
+.info svg {
+  color: var(--color-gray-400);
+  flex-shrink: 0;
+}
+
+.serial {
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+
+.model {
+  color: var(--color-gray-500);
+}
+
+.comment {
+  margin: var(--spacing-2) 0 0 0;
+  padding: var(--spacing-2) var(--spacing-3);
+  background-color: var(--color-gray-50);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+}

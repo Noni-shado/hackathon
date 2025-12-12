@@ -1,0 +1,229 @@
+.container {
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-5);
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-gray-900);
+  margin: 0 0 var(--spacing-5) 0;
+}
+
+.timeline {
+  position: relative;
+  padding-left: var(--spacing-6);
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 12px;
+  bottom: 12px;
+  width: 2px;
+  background-color: var(--color-gray-200);
+}
+
+.item {
+  position: relative;
+  padding-bottom: var(--spacing-5);
+}
+
+.item:last-child {
+  padding-bottom: 0;
+}
+
+.itemFirst .dot {
+  width: 28px;
+  height: 28px;
+  left: -8px;
+}
+
+.dot {
+  position: absolute;
+  left: -6px;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.dot.blue {
+  background-color: var(--edf-blue);
+  color: var(--color-white);
+}
+
+.dot.orange {
+  background-color: var(--edf-orange);
+  color: var(--color-white);
+}
+
+.dot.green {
+  background-color: var(--color-success);
+  color: var(--color-white);
+}
+
+.dot.red {
+  background-color: var(--color-error);
+  color: var(--color-white);
+}
+
+.dot.gray {
+  background-color: var(--color-gray-400);
+  color: var(--color-white);
+}
+
+.content {
+  padding-left: var(--spacing-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+}
+
+.badge.blue {
+  background-color: rgba(0, 85, 164, 0.1);
+  color: var(--edf-blue);
+}
+
+.badge.orange {
+  background-color: rgba(255, 107, 0, 0.1);
+  color: var(--edf-orange);
+}
+
+.badge.green {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.badge.red {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+}
+
+.badge.gray {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
+.datetime {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+}
+
+.details {
+  display: flex;
+  gap: var(--spacing-4);
+  flex-wrap: wrap;
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+}
+
+.detail svg {
+  color: var(--color-gray-400);
+}
+
+.comment {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background-color: var(--color-gray-50);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+}
+
+.comment svg {
+  color: var(--color-gray-400);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-8);
+  text-align: center;
+  color: var(--color-gray-400);
+}
+
+.empty p {
+  margin: var(--spacing-2) 0 0 0;
+  font-size: var(--font-size-sm);
+}
+
+/* Skeleton */
+.skeletonItem {
+  display: flex;
+  gap: var(--spacing-4);
+  padding-bottom: var(--spacing-5);
+}
+
+.skeletonDot {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  flex-shrink: 0;
+}
+
+.skeletonContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.skeletonLine {
+  height: 16px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+.skeletonLineShort {
+  height: 14px;
+  width: 60%;
+  background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
