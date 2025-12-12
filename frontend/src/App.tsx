@@ -4,7 +4,7 @@ import { useAuth } from './hooks/useAuth';
 import { Login, Dashboard, Inventory, ConcentrateurDetail, MapView, Actions } from './pages';
 import { Scan, NewAction, MyActions, MobileProfil } from './pages/mobile';
 import { StockMagasin, ReceptionCartons, TransfertBO } from './pages/magasin';
-import { StockBO, PoseConcentrateur, DeposeConcentrateur } from './pages/bo';
+import { StockBO, PoseConcentrateur, DeposeConcentrateur, ReceptionBO, DemandeTransfert } from './pages/bo';
 import { FileAttente, TestConcentrateur } from './pages/labo';
 import { Loading, ConnectionStatus, InstallPrompt } from './components/common';
 import { ReactNode } from 'react';
@@ -163,7 +163,7 @@ function AppRoutes() {
       <Route
         path="/bo/stock"
         element={
-          <ProtectedRoute allowedRoles={['bo', 'agent_terrain']}>
+          <ProtectedRoute allowedRoles={['bo', 'agent_terrain', 'gestionnaire']}>
             <StockBO />
           </ProtectedRoute>
         }
@@ -171,7 +171,7 @@ function AppRoutes() {
       <Route
         path="/bo/pose"
         element={
-          <ProtectedRoute allowedRoles={['bo', 'agent_terrain']}>
+          <ProtectedRoute allowedRoles={['bo', 'agent_terrain', 'gestionnaire']}>
             <PoseConcentrateur />
           </ProtectedRoute>
         }
@@ -179,8 +179,24 @@ function AppRoutes() {
       <Route
         path="/bo/depose"
         element={
-          <ProtectedRoute allowedRoles={['bo', 'agent_terrain']}>
+          <ProtectedRoute allowedRoles={['bo', 'agent_terrain', 'gestionnaire']}>
             <DeposeConcentrateur />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/bo/reception"
+        element={
+          <ProtectedRoute allowedRoles={['bo', 'agent_terrain', 'gestionnaire']}>
+            <ReceptionBO />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/bo/demande"
+        element={
+          <ProtectedRoute allowedRoles={['bo', 'agent_terrain', 'gestionnaire']}>
+            <DemandeTransfert />
           </ProtectedRoute>
         }
       />

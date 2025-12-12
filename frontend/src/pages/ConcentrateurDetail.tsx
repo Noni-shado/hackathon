@@ -90,6 +90,29 @@ export function ConcentrateurDetail() {
     console.log('New action');
   };
 
+  const handleExportCSV = () => {
+    if (!concentrateur || historique.length === 0) return;
+    
+    const headers = ['Date', 'Type', 'Ancien État', 'Nouvel État', 'Ancienne Affectation', 'Nouvelle Affectation', 'Commentaire'];
+    const rows = historique.map(action => [
+      new Date(action.date_action).toLocaleString('fr-FR'),
+      action.type_action,
+      action.ancien_etat || '',
+      action.nouvel_etat || '',
+      action.ancienne_affectation || '',
+      action.nouvelle_affectation || '',
+      action.commentaire || ''
+    ]);
+    
+    const csv = [headers, ...rows].map(row => row.join(';')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `historique_${concentrateur.numero_serie}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -159,9 +182,14 @@ export function ConcentrateurDetail() {
                 Nouvelle action
               </Button>
             )}
-            <Button variant="outline" size="sm" disabled>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              disabled={historique.length === 0}
+              onClick={() => handleExportCSV()}
+            >
               <FileDown size={16} />
-              Export PDF
+              Export CSV
             </Button>
           </div>
         </div>

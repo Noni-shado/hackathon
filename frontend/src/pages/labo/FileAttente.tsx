@@ -153,7 +153,7 @@ export function FileAttente() {
                     <Button 
                       variant="primary" 
                       size="sm"
-                      onClick={() => navigate(`/labo/test?numero_serie=${c.numero_serie}`)}
+                      onClick={() => navigate('/labo/test')}
                     >
                       Effectuer le test
                     </Button>

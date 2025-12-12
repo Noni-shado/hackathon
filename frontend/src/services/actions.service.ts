@@ -20,6 +20,12 @@ export interface ActionCreate {
   scan_qr?: boolean;
 }
 
+export interface ConcentrateurInfo {
+  numero_serie: string;
+  modele?: string;
+  operateur?: string;
+}
+
 export interface ActionResponse {
   id_action: number;
   type_action: string;
@@ -35,6 +41,7 @@ export interface ActionResponse {
   concentrateur_id?: string;
   carton_id?: string;
   poste_id?: number;
+  concentrateur?: ConcentrateurInfo;
 }
 
 export interface ActionListResponse {

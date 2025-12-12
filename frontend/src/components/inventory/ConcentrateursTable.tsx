@@ -9,17 +9,24 @@ interface ConcentrateursTableProps {
 }
 
 const statutLabels: Record<string, string> = {
-  stock: 'En stock',
-  pose: 'En pose',
-  retour_constructeur: 'Retour',
-  destruction: 'Destruction',
+  en_stock: 'En stock',
+  pose: 'Posé',
+  en_livraison: 'En livraison',
+  a_tester: 'À tester',
+  hs: 'HS',
 };
 
 const statutColors: Record<string, string> = {
-  stock: 'yellow',
+  en_stock: 'blue',
   pose: 'green',
-  retour_constructeur: 'red',
-  destruction: 'gray',
+  en_livraison: 'yellow',
+  a_tester: 'orange',
+  hs: 'red',
+};
+
+const getDisplayValue = (value: string | null | undefined, defaultValue: string): string => {
+  if (!value || value.trim() === '') return defaultValue;
+  return value;
 };
 
 export function ConcentrateursTable({ concentrateurs, loading, onRowClick }: ConcentrateursTableProps) {
@@ -88,20 +95,20 @@ export function ConcentrateursTable({ concentrateurs, loading, onRowClick }: Con
           <tbody>
             {concentrateurs.map((c) => (
               <tr
-                key={c.id}
+                key={c.numero_serie}
                 className={styles.row}
                 onClick={() => onRowClick(c.numero_serie)}
               >
                 <td className={styles.serial}>{c.numero_serie}</td>
-                <td>{c.modele}</td>
+                <td>{getDisplayValue(c.modele, 'Concentrateur IOT')}</td>
                 <td>
-                  <span className={`${styles.badge} ${styles[statutColors[c.statut] || 'gray']}`}>
-                    {statutLabels[c.statut] || c.statut}
+                  <span className={`${styles.badge} ${styles[statutColors[c.etat] || 'gray']}`}>
+                    {statutLabels[c.etat] || c.etat || 'En stock'}
                   </span>
                 </td>
-                <td>{c.base_operationnelle}</td>
+                <td>{getDisplayValue(c.affectation, 'Non affecté')}</td>
                 <td className={styles.date}>
-                  {c.date_derniere_action ? formatDate(c.date_derniere_action) : '-'}
+                  {c.date_dernier_etat ? formatDate(c.date_dernier_etat) : 'Aucune'}
                 </td>
               </tr>
             ))}
@@ -113,28 +120,28 @@ export function ConcentrateursTable({ concentrateurs, loading, onRowClick }: Con
       <div className={styles.cards}>
         {concentrateurs.map((c) => (
           <div
-            key={c.id}
+            key={c.numero_serie}
             className={styles.card}
             onClick={() => onRowClick(c.numero_serie)}
           >
             <div className={styles.cardHeader}>
               <span className={styles.cardSerial}>{c.numero_serie}</span>
-              <span className={`${styles.badge} ${styles[statutColors[c.statut] || 'gray']}`}>
-                {statutLabels[c.statut] || c.statut}
+              <span className={`${styles.badge} ${styles[statutColors[c.etat] || 'gray']}`}>
+                {statutLabels[c.etat] || c.etat || 'En stock'}
               </span>
             </div>
             <div className={styles.cardBody}>
               <div className={styles.cardInfo}>
                 <Package size={14} />
-                <span>{c.modele}</span>
+                <span>{getDisplayValue(c.modele, 'Concentrateur IOT')}</span>
               </div>
               <div className={styles.cardInfo}>
                 <MapPin size={14} />
-                <span>{c.base_operationnelle}</span>
+                <span>{getDisplayValue(c.affectation, 'Non affecté')}</span>
               </div>
               <div className={styles.cardInfo}>
                 <Clock size={14} />
-                <span>{c.date_derniere_action ? formatDate(c.date_derniere_action) : '-'}</span>
+                <span>{c.date_dernier_etat ? formatDate(c.date_dernier_etat) : 'Aucune'}</span>
               </div>
             </div>
           </div>

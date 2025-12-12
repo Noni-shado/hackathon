@@ -5,7 +5,7 @@ import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { SearchBar, Filters, ConcentrateursTable, Pagination } from '../components/inventory';
 import { concentrateursService, ConcentrateurListResponse } from '../services/concentrateurs.service';
 import { useDebounce } from '../hooks/useDebounce';
-import type { Concentrateur, ConcentrateurStatut } from '../types';
+import type { Concentrateur, ConcentrateurEtat } from '../types';
 import styles from './Inventory.module.css';
 
 const ITEMS_PER_PAGE = 20;
@@ -18,7 +18,7 @@ export function Inventory() {
   const [error, setError] = useState<string | null>(null);
   
   const [search, setSearch] = useState('');
-  const [statut, setStatut] = useState<ConcentrateurStatut | ''>('');
+  const [statut, setStatut] = useState<ConcentrateurEtat | ''>('');
   const [base, setBase] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -35,8 +35,8 @@ export function Inventory() {
         page,
         limit: ITEMS_PER_PAGE,
         search: debouncedSearch || undefined,
-        statut: statut || undefined,
-        base: base || undefined,
+        etat: statut || undefined,
+        affectation: base || undefined,
       });
       
       setConcentrateurs(response.data);

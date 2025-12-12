@@ -1,260 +1,432 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Truck, 
   QrCode, 
   CheckCircle, 
   AlertTriangle,
   Loader2,
-  Plus,
   X,
-  Send
+  Package,
+  Clock,
+  User,
+  MapPin,
+  Keyboard,
+  RefreshCw,
+  Search
 } from 'lucide-react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Button } from '../../components/common';
-import { concentrateursService } from '../../services/concentrateurs.service';
-import api from '../../services/api';
-import type { Concentrateur } from '../../types';
+import { transfertsService, Commande, CartonDisponible, ValidationResult } from '../../services/transferts.service';
 import styles from './TransfertBO.module.css';
 
-const BOS = ['BO Nord', 'BO Sud', 'BO Centre'];
+type PanelMode = 'scan' | 'manual';
 
 export function TransfertBO() {
-  const navigate = useNavigate();
-  const [step, setStep] = useState<'select' | 'scan' | 'confirm' | 'success'>('select');
-  const [boDestination, setBoDestination] = useState(BOS[0]);
-  const [numeroSerie, setNumeroSerie] = useState('');
-  const [concentrateurs, setConcentrateurs] = useState<Concentrateur[]>([]);
-  const [loading, setLoading] = useState(false);
+  // États principaux
+  const [commandes, setCommandes] = useState<Commande[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ transferred: number } | null>(null);
+  
+  // États du SlidePanel
+  const [selectedCommande, setSelectedCommande] = useState<Commande | null>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [panelMode, setPanelMode] = useState<PanelMode>('manual');
+  const [numeroCarton, setNumeroCarton] = useState('');
+  const [cartonsDisponibles, setCartonsDisponibles] = useState<CartonDisponible[]>([]);
+  const [validating, setValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const [panelError, setPanelError] = useState<string | null>(null);
+  
+  // Filtres
+  const [statutFilter, setStatutFilter] = useState<string>('en_attente');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSelectBO = () => {
-    setStep('scan');
-  };
-
-  const handleAddConcentrateur = async () => {
-    if (!numeroSerie.trim()) return;
-    
+  // Charger les commandes
+  const fetchCommandes = useCallback(async () => {
     setLoading(true);
     setError(null);
-
     try {
-      const response = await concentrateursService.verifyConcentrateur(numeroSerie.trim());
-      if (!response.exists || !response.concentrateur) {
-        setError(`Concentrateur "${numeroSerie}" introuvable`);
-      } else if (response.concentrateur.affectation !== 'Magasin') {
-        setError(`Ce concentrateur n'est pas au Magasin (actuellement: ${response.concentrateur.affectation})`);
-      } else if (concentrateurs.find(c => c.numero_serie === response.concentrateur?.numero_serie)) {
-        setError('Ce concentrateur est déjà dans la liste');
-      } else {
-        setConcentrateurs([...concentrateurs, response.concentrateur]);
-        setNumeroSerie('');
-      }
+      const data = await transfertsService.getCommandes(statutFilter || undefined);
+      setCommandes(data);
     } catch (err) {
-      setError('Erreur lors de la vérification');
+      setError('Erreur lors du chargement des commandes');
+      console.error(err);
     } finally {
       setLoading(false);
     }
+  }, [statutFilter]);
+
+  useEffect(() => {
+    fetchCommandes();
+  }, [fetchCommandes]);
+
+  // Charger les cartons disponibles quand le panel s'ouvre
+  const fetchCartonsDisponibles = async () => {
+    try {
+      const cartons = await transfertsService.getCartonsDisponibles();
+      setCartonsDisponibles(cartons);
+    } catch (err) {
+      console.error('Erreur chargement cartons:', err);
+    }
   };
 
-  const handleRemoveConcentrateur = (numeroSerie: string) => {
-    setConcentrateurs(concentrateurs.filter(c => c.numero_serie !== numeroSerie));
+  // Ouvrir le panel pour une commande
+  const handleRowClick = (commande: Commande) => {
+    if (commande.statut_commande !== 'en_attente') return;
+    
+    setSelectedCommande(commande);
+    setPanelOpen(true);
+    setPanelMode('manual');
+    setNumeroCarton('');
+    setPanelError(null);
+    setValidationResult(null);
+    fetchCartonsDisponibles();
   };
 
-  const handleConfirm = () => {
-    if (concentrateurs.length === 0) {
-      setError('Ajoutez au moins un concentrateur');
+  // Fermer le panel
+  const handleClosePanel = () => {
+    setPanelOpen(false);
+    setSelectedCommande(null);
+    setNumeroCarton('');
+    setPanelError(null);
+    setValidationResult(null);
+  };
+
+  // Valider le transfert
+  const handleValidate = async () => {
+    if (!selectedCommande || !numeroCarton.trim()) {
+      setPanelError('Veuillez saisir ou scanner un numéro de carton');
       return;
     }
-    setStep('confirm');
-  };
 
-  const handleValidate = async () => {
-    setLoading(true);
-    setError(null);
+    setValidating(true);
+    setPanelError(null);
 
     try {
-      const response = await api.post('/magasin/transfert', {
-        bo_destination: boDestination,
-        concentrateurs: concentrateurs.map(c => c.numero_serie),
-      });
-      setResult(response.data);
-      setStep('success');
+      const result = await transfertsService.validerTransfert(
+        selectedCommande.id_commande,
+        numeroCarton.trim()
+      );
+      setValidationResult(result);
+      // Rafraîchir la liste
+      fetchCommandes();
     } catch (err: any) {
-      const message = err.response?.data?.detail || 'Erreur lors du transfert';
-      setError(message);
+      const message = err.response?.data?.detail || 'Erreur lors de la validation';
+      setPanelError(message);
     } finally {
-      setLoading(false);
+      setValidating(false);
     }
   };
 
-  const handleReset = () => {
-    setStep('select');
-    setBoDestination(BOS[0]);
-    setNumeroSerie('');
-    setConcentrateurs([]);
-    setError(null);
-    setResult(null);
+  // Filtrer les commandes
+  const filteredCommandes = commandes.filter(c => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      c.bo_demandeur.toLowerCase().includes(search) ||
+      c.demandeur_nom?.toLowerCase().includes(search) ||
+      c.demandeur_prenom?.toLowerCase().includes(search) ||
+      c.id_commande.toString().includes(search)
+    );
+  });
+
+  // Formater la date
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Badge de statut
+  const getStatutBadge = (statut: string) => {
+    const badges: Record<string, { label: string; className: string }> = {
+      en_attente: { label: 'En attente', className: styles.badgePending },
+      en_preparation: { label: 'En préparation', className: styles.badgeProgress },
+      validee: { label: 'Validée', className: styles.badgeSuccess },
+      annulee: { label: 'Annulée', className: styles.badgeCancelled }
+    };
+    const badge = badges[statut] || { label: statut, className: '' };
+    return <span className={`${styles.badge} ${badge.className}`}>{badge.label}</span>;
   };
 
   return (
     <DashboardLayout>
       <div className={styles.container}>
+        {/* Header */}
         <header className={styles.header}>
-          <Truck size={28} />
-          <div>
-            <h1>Transfert vers BO</h1>
-            <p>Préparer les livraisons pour les bases opérationnelles</p>
+          <div className={styles.headerContent}>
+            <Truck size={28} />
+            <div>
+              <h1>Transferts vers BO</h1>
+              <p>Gérer les demandes de transfert des bases opérationnelles</p>
+            </div>
           </div>
+          <Button variant="outline" onClick={fetchCommandes} disabled={loading}>
+            <RefreshCw size={16} className={loading ? styles.spinning : ''} />
+            Actualiser
+          </Button>
         </header>
 
-        {step === 'select' && (
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <Send size={24} />
-              <h2>Sélectionner la destination</h2>
-            </div>
-            <div className={styles.cardBody}>
-              <div className={styles.field}>
-                <label>Base opérationnelle</label>
-                <select value={boDestination} onChange={(e) => setBoDestination(e.target.value)}>
-                  {BOS.map(bo => (
-                    <option key={bo} value={bo}>{bo}</option>
-                  ))}
-                </select>
-              </div>
-              <Button variant="primary" onClick={handleSelectBO}>
-                Continuer
-              </Button>
-            </div>
+        {/* Filtres */}
+        <div className={styles.filters}>
+          <div className={styles.searchBox}>
+            <Search size={18} />
+            <input
+              type="search"
+              placeholder="Rechercher une demande..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className={styles.filterGroup}>
+            <label>Statut</label>
+            <select value={statutFilter} onChange={(e) => setStatutFilter(e.target.value)}>
+              <option value="">Tous</option>
+              <option value="en_attente">En attente</option>
+              <option value="validee">Validées</option>
+              <option value="annulee">Annulées</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Message d'erreur */}
+        {error && (
+          <div className={styles.errorBanner}>
+            <AlertTriangle size={20} />
+            <span>{error}</span>
           </div>
         )}
 
-        {step === 'scan' && (
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <QrCode size={24} />
-              <h2>Scanner les concentrateurs</h2>
+        {/* Tableau des demandes */}
+        <div className={styles.tableContainer}>
+          {loading ? (
+            <div className={styles.loadingState}>
+              <Loader2 size={32} className={styles.spinning} />
+              <span>Chargement des demandes...</span>
             </div>
-            <div className={styles.cardBody}>
-              <div className={styles.infoBox}>
-                <span className={styles.label}>Destination</span>
-                <span className={styles.value}>{boDestination}</span>
-              </div>
-
-              <div className={styles.scanRow}>
-                <input
-                  type="text"
-                  placeholder="N° série du concentrateur"
-                  value={numeroSerie}
-                  onChange={(e) => setNumeroSerie(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddConcentrateur()}
-                  disabled={loading}
-                />
-                <Button variant="primary" onClick={handleAddConcentrateur} disabled={loading || !numeroSerie.trim()}>
-                  {loading ? <Loader2 size={18} className={styles.spinning} /> : <Plus size={18} />}
-                </Button>
-              </div>
-
-              {error && (
-                <div className={styles.error}>
-                  <AlertTriangle size={16} />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {concentrateurs.length > 0 && (
-                <div className={styles.list}>
-                  <h3>{concentrateurs.length} concentrateur(s) sélectionné(s)</h3>
-                  {concentrateurs.map(c => (
-                    <div key={c.numero_serie} className={styles.listItem}>
-                      <div>
-                        <span className={styles.serial}>{c.numero_serie}</span>
-                        <span className={styles.model}>{c.modele || '-'}</span>
+          ) : filteredCommandes.length === 0 ? (
+            <div className={styles.emptyState}>
+              <Package size={48} />
+              <h3>Aucune demande</h3>
+              <p>Il n'y a pas de demande de transfert correspondant à vos critères</p>
+            </div>
+          ) : (
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>N°</th>
+                  <th>BO Demandeur</th>
+                  <th>Quantité</th>
+                  <th>Demandeur</th>
+                  <th>Date</th>
+                  <th>Statut</th>
+                  <th>Carton</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCommandes.map((commande) => (
+                  <tr 
+                    key={commande.id_commande}
+                    onClick={() => handleRowClick(commande)}
+                    className={commande.statut_commande === 'en_attente' ? styles.clickableRow : ''}
+                  >
+                    <td className={styles.idCell}>#{commande.id_commande}</td>
+                    <td>
+                      <div className={styles.boCell}>
+                        <MapPin size={14} />
+                        {commande.bo_demandeur}
                       </div>
-                      <button onClick={() => handleRemoveConcentrateur(c.numero_serie)}>
-                        <X size={18} />
+                    </td>
+                    <td className={styles.quantityCell}>{commande.quantite}</td>
+                    <td>
+                      <div className={styles.userCell}>
+                        <User size={14} />
+                        {commande.demandeur_prenom} {commande.demandeur_nom}
+                      </div>
+                    </td>
+                    <td>
+                      <div className={styles.dateCell}>
+                        <Clock size={14} />
+                        {formatDate(commande.date_commande)}
+                      </div>
+                    </td>
+                    <td>{getStatutBadge(commande.statut_commande)}</td>
+                    <td className={styles.cartonCell}>
+                      -
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* SlidePanel */}
+        {panelOpen && selectedCommande && (
+          <div className={styles.overlay} onClick={handleClosePanel}>
+            <div className={styles.slidePanel} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.panelHeader}>
+                <h2>Valider le transfert #{selectedCommande.id_commande}</h2>
+                <button className={styles.closeBtn} onClick={handleClosePanel}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className={styles.panelContent}>
+                {/* Résumé de la demande */}
+                <div className={styles.demandeSummary}>
+                  <div className={styles.summaryItem}>
+                    <MapPin size={16} />
+                    <div>
+                      <span className={styles.summaryLabel}>Destination</span>
+                      <span className={styles.summaryValue}>{selectedCommande.bo_demandeur}</span>
+                    </div>
+                  </div>
+                  <div className={styles.summaryItem}>
+                    <Package size={16} />
+                    <div>
+                      <span className={styles.summaryLabel}>Quantité demandée</span>
+                      <span className={styles.summaryValue}>{selectedCommande.quantite} concentrateurs</span>
+                    </div>
+                  </div>
+                  <div className={styles.summaryItem}>
+                    <User size={16} />
+                    <div>
+                      <span className={styles.summaryLabel}>Demandeur</span>
+                      <span className={styles.summaryValue}>
+                        {selectedCommande.demandeur_prenom} {selectedCommande.demandeur_nom}
+                      </span>
+                    </div>
+                  </div>
+                  {selectedCommande.operateur_souhaite && (
+                    <div className={styles.commentaire}>
+                      <strong>Opérateur souhaité:</strong> {selectedCommande.operateur_souhaite}
+                    </div>
+                  )}
+                </div>
+
+                {/* Résultat de validation */}
+                {validationResult ? (
+                  <div className={styles.successResult}>
+                    <CheckCircle size={48} />
+                    <h3>Transfert validé !</h3>
+                    <p>{validationResult.concentrateurs_transferes} concentrateur(s) transféré(s) vers {validationResult.bo_destination}</p>
+                    <div className={styles.resultDetails}>
+                      <span>Carton: <strong>{validationResult.carton}</strong></span>
+                    </div>
+                    <Button variant="primary" onClick={handleClosePanel}>
+                      Fermer
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    {/* Choix du mode */}
+                    <div className={styles.modeSelector}>
+                      <button
+                        className={`${styles.modeBtn} ${panelMode === 'scan' ? styles.active : ''}`}
+                        onClick={() => setPanelMode('scan')}
+                      >
+                        <QrCode size={20} />
+                        Scanner QR
+                      </button>
+                      <button
+                        className={`${styles.modeBtn} ${panelMode === 'manual' ? styles.active : ''}`}
+                        onClick={() => setPanelMode('manual')}
+                      >
+                        <Keyboard size={20} />
+                        Saisie manuelle
                       </button>
                     </div>
-                  ))}
-                </div>
-              )}
 
-              <div className={styles.actions}>
-                <Button variant="outline" onClick={() => setStep('select')}>
-                  Retour
-                </Button>
-                <Button variant="primary" onClick={handleConfirm} disabled={concentrateurs.length === 0}>
-                  Continuer ({concentrateurs.length})
-                </Button>
+                    {/* Zone de saisie */}
+                    {panelMode === 'scan' ? (
+                      <div className={styles.scanZone}>
+                        <QrCode size={64} />
+                        <p>Scannez le QR code du carton</p>
+                        <input
+                          type="text"
+                          placeholder="En attente du scan..."
+                          value={numeroCarton}
+                          onChange={(e) => setNumeroCarton(e.target.value)}
+                          autoFocus
+                          className={styles.scanInput}
+                        />
+                      </div>
+                    ) : (
+                      <div className={styles.manualZone}>
+                        <label>Numéro du carton</label>
+                        <input
+                          type="text"
+                          placeholder="Ex: CART-2024-001"
+                          value={numeroCarton}
+                          onChange={(e) => setNumeroCarton(e.target.value)}
+                          autoFocus
+                        />
+                        
+                        {/* Liste des cartons disponibles */}
+                        {cartonsDisponibles.length > 0 && (
+                          <div className={styles.cartonsListe}>
+                            <h4>Cartons disponibles</h4>
+                            <div className={styles.cartonsList}>
+                              {cartonsDisponibles.map((carton) => (
+                                <button
+                                  key={carton.numero_carton}
+                                  className={`${styles.cartonItem} ${numeroCarton === carton.numero_carton ? styles.selected : ''}`}
+                                  onClick={() => setNumeroCarton(carton.numero_carton)}
+                                >
+                                  <div className={styles.cartonInfo}>
+                                    <span className={styles.cartonNum}>{carton.numero_carton}</span>
+                                    <span className={styles.cartonOp}>{carton.operateur}</span>
+                                  </div>
+                                  <span className={styles.cartonCount}>
+                                    {carton.concentrateurs_disponibles} dispo.
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Erreur */}
+                    {panelError && (
+                      <div className={styles.panelError}>
+                        <AlertTriangle size={16} />
+                        <span>{panelError}</span>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className={styles.panelActions}>
+                      <Button variant="outline" onClick={handleClosePanel}>
+                        Annuler
+                      </Button>
+                      <Button 
+                        variant="primary" 
+                        onClick={handleValidate}
+                        disabled={validating || !numeroCarton.trim()}
+                      >
+                        {validating ? (
+                          <>
+                            <Loader2 size={18} className={styles.spinning} />
+                            Validation...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle size={18} />
+                            Valider le transfert
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
-          </div>
-        )}
-
-        {step === 'confirm' && (
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <CheckCircle size={24} />
-              <h2>Confirmer le transfert</h2>
-            </div>
-            <div className={styles.cardBody}>
-              <div className={styles.summary}>
-                <div className={styles.summaryRow}>
-                  <span>Destination</span>
-                  <strong>{boDestination}</strong>
-                </div>
-                <div className={styles.summaryRow}>
-                  <span>Nombre de concentrateurs</span>
-                  <strong>{concentrateurs.length}</strong>
-                </div>
-              </div>
-
-              <div className={styles.listCompact}>
-                {concentrateurs.map(c => (
-                  <span key={c.numero_serie} className={styles.chip}>{c.numero_serie}</span>
-                ))}
-              </div>
-
-              {error && (
-                <div className={styles.error}>
-                  <AlertTriangle size={16} />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              <div className={styles.actions}>
-                <Button variant="outline" onClick={() => setStep('scan')}>
-                  Modifier
-                </Button>
-                <Button variant="primary" onClick={handleValidate} disabled={loading}>
-                  {loading ? (
-                    <>
-                      <Loader2 size={18} className={styles.spinning} />
-                      Transfert...
-                    </>
-                  ) : (
-                    'Valider le transfert'
-                  )}
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step === 'success' && result && (
-          <div className={styles.successCard}>
-            <CheckCircle size={64} />
-            <h2>Transfert validé !</h2>
-            <p>{result.transferred} concentrateur(s) transféré(s) vers {boDestination}</p>
-            <div className={styles.actions}>
-              <Button variant="outline" onClick={handleReset}>
-                Nouveau transfert
-              </Button>
-              <Button variant="primary" onClick={() => navigate('/magasin/stock')}>
-                Voir le stock
-              </Button>
             </div>
           </div>
         )}

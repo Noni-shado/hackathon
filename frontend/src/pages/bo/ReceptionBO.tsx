@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { 
-  RotateCcw, 
+  PackageCheck, 
   QrCode, 
   CheckCircle, 
   AlertTriangle,
@@ -13,19 +13,18 @@ import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Button } from '../../components/common';
 import { boService } from '../../services/bo.service';
 import { useAuth } from '../../hooks/useAuth';
-import styles from './DeposeConcentrateur.module.css';
+import styles from './ReceptionBO.module.css';
 
 type InputMode = 'scan' | 'manual';
 
-export function DeposeConcentrateur() {
+export function ReceptionBO() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const boName = user?.base_affectee || 'BO';
   
   const [step, setStep] = useState<'mode' | 'input' | 'success'>('mode');
   const [inputMode, setInputMode] = useState<InputMode>('scan');
-  const [numeroSerie, setNumeroSerie] = useState(searchParams.get('numero_serie') || '');
+  const [numeroSerie, setNumeroSerie] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);
@@ -36,7 +35,7 @@ export function DeposeConcentrateur() {
     setError(null);
   };
 
-  const handleDepose = async () => {
+  const handleReception = async () => {
     if (!numeroSerie.trim()) {
       setError('Veuillez saisir le numero de serie');
       return;
@@ -46,11 +45,11 @@ export function DeposeConcentrateur() {
     setError(null);
 
     try {
-      const res = await boService.depose(numeroSerie.trim());
+      const res = await boService.reception(numeroSerie.trim());
       setResult(res);
       setStep('success');
     } catch (err: any) {
-      const message = err.response?.data?.detail || 'Erreur lors de la depose';
+      const message = err.response?.data?.detail || 'Erreur lors de la reception';
       setError(message);
     } finally {
       setLoading(false);
@@ -68,10 +67,10 @@ export function DeposeConcentrateur() {
     <DashboardLayout>
       <div className={styles.container}>
         <header className={styles.header}>
-          <RotateCcw size={28} />
+          <PackageCheck size={28} />
           <div>
-            <h1>Depose de concentrateur</h1>
-            <p>{boName} - Passer un concentrateur de "pose" a "a_tester"</p>
+            <h1>Reception concentrateur</h1>
+            <p>{boName} - Receptionner un concentrateur en livraison</p>
           </div>
         </header>
 
@@ -107,9 +106,13 @@ export function DeposeConcentrateur() {
                   placeholder="Ex: CPL-BOU-20241211-ABC123"
                   value={numeroSerie}
                   onChange={(e) => setNumeroSerie(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleDepose()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleReception()}
                   autoFocus
                 />
+              </div>
+
+              <div className={styles.infoBox}>
+                <p>Le concentrateur passera de "en_livraison" a "en_stock" et sera affecte a {boName}</p>
               </div>
 
               {error && (
@@ -123,14 +126,14 @@ export function DeposeConcentrateur() {
                 <Button variant="outline" onClick={() => setStep('mode')}>
                   Retour
                 </Button>
-                <Button variant="primary" onClick={handleDepose} disabled={loading || !numeroSerie.trim()}>
+                <Button variant="primary" onClick={handleReception} disabled={loading || !numeroSerie.trim()}>
                   {loading ? (
                     <>
                       <Loader2 size={18} className={styles.spinning} />
-                      Depose en cours...
+                      Reception en cours...
                     </>
                   ) : (
-                    'Valider la depose'
+                    'Valider la reception'
                   )}
                 </Button>
               </div>
@@ -141,7 +144,7 @@ export function DeposeConcentrateur() {
         {step === 'success' && result && (
           <div className={styles.successCard}>
             <CheckCircle size={64} />
-            <h2>Depose validee !</h2>
+            <h2>Reception validee !</h2>
             <p>{result.message}</p>
             <div className={styles.successDetails}>
               <div>
@@ -149,17 +152,17 @@ export function DeposeConcentrateur() {
                 <span className={styles.value}>{result.numero_serie}</span>
               </div>
               <div>
-                <span className={styles.label}>Ancien etat</span>
-                <span className={styles.value}>{result.ancien_etat}</span>
+                <span className={styles.label}>Ancienne affectation</span>
+                <span className={styles.value}>{result.ancienne_affectation || '-'}</span>
               </div>
               <div>
-                <span className={styles.label}>Nouvel etat</span>
-                <span className={styles.value}>{result.nouvel_etat}</span>
+                <span className={styles.label}>Nouvelle affectation</span>
+                <span className={styles.value}>{result.nouvelle_affectation}</span>
               </div>
             </div>
             <div className={styles.actions}>
               <Button variant="outline" onClick={handleReset}>
-                Nouvelle depose
+                Nouvelle reception
               </Button>
               <Button variant="primary" onClick={() => navigate('/bo/stock')}>
                 Voir le stock

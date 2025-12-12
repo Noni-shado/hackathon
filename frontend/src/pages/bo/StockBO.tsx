@@ -5,12 +5,14 @@ import {
   RefreshCw, 
   Filter,
   AlertTriangle,
-  Zap
+  Zap,
+  Building2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Button } from '../../components/common';
 import { concentrateursService } from '../../services/concentrateurs.service';
+import { boService, BOStats } from '../../services/bo.service';
 import { useAuth } from '../../hooks/useAuth';
 import type { Concentrateur } from '../../types';
 import styles from './StockBO.module.css';
@@ -34,34 +36,68 @@ const etatColors: Record<string, string> = {
 export function StockBO() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const boName = user?.base_affectee || 'BO Nord';
+  const isAdmin = user?.role === 'admin';
+  const defaultBo = user?.base_affectee || '';
   
+  const [selectedBo, setSelectedBo] = useState<string>(defaultBo);
+  const [listeBo, setListeBo] = useState<string[]>([]);
   const [concentrateurs, setConcentrateurs] = useState<Concentrateur[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [filterEtat, setFilterEtat] = useState('');
   const [total, setTotal] = useState(0);
+  const [stats, setStats] = useState<BOStats | null>(null);
+
+  // Charger la liste des BO pour l'admin
+  useEffect(() => {
+    if (isAdmin) {
+      boService.getListeBo()
+        .then(bos => {
+          setListeBo(bos);
+          if (bos.length > 0 && !selectedBo) {
+            setSelectedBo(bos[0]);
+          }
+        })
+        .catch(err => console.error('Erreur chargement liste BO:', err));
+    }
+  }, [isAdmin]);
+
+  const boToDisplay = isAdmin ? selectedBo : defaultBo;
 
   const fetchConcentrateurs = useCallback(async () => {
+    if (!boToDisplay) {
+      setConcentrateurs([]);
+      setTotal(0);
+      setStats(null);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
-      const response = await concentrateursService.getConcentrateurs({
-        affectation: boName,
-        search: search || undefined,
-        etat: filterEtat as any || undefined,
-        limit: 100,
-      });
+      
+      // Charger les stats et les concentrateurs en parallele
+      const [response, boStats] = await Promise.all([
+        concentrateursService.getConcentrateurs({
+          affectation: boToDisplay,
+          search: search || undefined,
+          etat: filterEtat as any || undefined,
+          limit: 100,
+        }),
+        boService.getStats(boToDisplay)
+      ]);
+      
       setConcentrateurs(response.data);
       setTotal(response.total);
+      setStats(boStats);
     } catch (err) {
       setError('Erreur lors du chargement');
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, [boName, search, filterEtat]);
+  }, [boToDisplay, search, filterEtat]);
 
   useEffect(() => {
     fetchConcentrateurs();
@@ -72,10 +108,11 @@ export function StockBO() {
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
-  const stats = {
-    total: concentrateurs.length,
-    enStock: concentrateurs.filter(c => c.etat === 'en_stock').length,
-    poses: concentrateurs.filter(c => c.etat === 'pose').length,
+  const displayStats = {
+    total: stats?.total ?? 0,
+    enStock: stats?.en_stock ?? 0,
+    poses: stats?.poses ?? 0,
+    aTester: stats?.a_tester ?? 0,
   };
 
   return (
@@ -85,11 +122,26 @@ export function StockBO() {
           <div className={styles.headerTitle}>
             <Package size={28} />
             <div>
-              <h1>Stock {boName}</h1>
-              <p>Concentrateurs affectés à votre base</p>
+              <h1>Stock {boToDisplay || 'BO'}</h1>
+              <p>{isAdmin ? 'Vue administrateur - Selectionnez une BO' : 'Concentrateurs affectes a votre base'}</p>
             </div>
           </div>
           <div className={styles.headerActions}>
+            {isAdmin && listeBo.length > 0 && (
+              <div className={styles.boSelector}>
+                <Building2 size={16} />
+                <select 
+                  value={selectedBo} 
+                  onChange={(e) => setSelectedBo(e.target.value)}
+                  className={styles.boSelect}
+                >
+                  <option value="">-- Choisir une BO --</option>
+                  {listeBo.map(bo => (
+                    <option key={bo} value={bo}>{bo}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <Button variant="outline" size="sm" onClick={fetchConcentrateurs} disabled={loading}>
               <RefreshCw size={16} className={loading ? styles.spinning : ''} />
             </Button>
@@ -102,16 +154,20 @@ export function StockBO() {
 
         <div className={styles.stats}>
           <div className={styles.statCard}>
-            <span className={styles.statValue}>{stats.total}</span>
-            <span className={styles.statLabel}>Total affectés</span>
+            <span className={styles.statValue}>{displayStats.total}</span>
+            <span className={styles.statLabel}>Total affectes</span>
           </div>
           <div className={`${styles.statCard} ${styles.green}`}>
-            <span className={styles.statValue}>{stats.enStock}</span>
+            <span className={styles.statValue}>{displayStats.enStock}</span>
             <span className={styles.statLabel}>En stock</span>
           </div>
           <div className={`${styles.statCard} ${styles.orange}`}>
-            <span className={styles.statValue}>{stats.poses}</span>
-            <span className={styles.statLabel}>Posés</span>
+            <span className={styles.statValue}>{displayStats.poses}</span>
+            <span className={styles.statLabel}>Poses</span>
+          </div>
+          <div className={`${styles.statCard} ${styles.yellow}`}>
+            <span className={styles.statValue}>{displayStats.aTester}</span>
+            <span className={styles.statLabel}>A tester</span>
           </div>
         </div>
 

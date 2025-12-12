@@ -25,6 +25,15 @@ class ActionCreate(BaseModel):
     scan_qr: bool = False
 
 
+class ConcentrateurInfo(BaseModel):
+    numero_serie: str
+    modele: Optional[str] = None
+    operateur: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+
 class ActionResponse(BaseModel):
     id_action: int
     type_action: str
@@ -38,6 +47,7 @@ class ActionResponse(BaseModel):
     photo: Optional[str] = None
     user_id: int
     concentrateur_id: Optional[str] = None
+    concentrateur: Optional[ConcentrateurInfo] = None
 
     class Config:
         from_attributes = True
@@ -129,7 +139,7 @@ async def get_my_actions(
     current_user: Utilisateur = Depends(get_current_user)
 ):
     """
-    Liste des actions de l'utilisateur connecté.
+    Liste des actions de l'utilisateur connecté avec infos concentrateur.
     """
     # Compter le total
     count_query = select(func.count()).select_from(HistoriqueAction).where(
@@ -147,10 +157,43 @@ async def get_my_actions(
     result = await db.execute(query)
     actions = result.scalars().all()
     
+    # Enrichir avec les infos concentrateur
+    actions_with_concentrateur = []
+    for action in actions:
+        action_dict = {
+            "id_action": action.id_action,
+            "type_action": action.type_action,
+            "date_action": action.date_action,
+            "ancien_etat": action.ancien_etat,
+            "nouvel_etat": action.nouvel_etat,
+            "ancienne_affectation": action.ancienne_affectation,
+            "nouvelle_affectation": action.nouvelle_affectation,
+            "commentaire": action.commentaire,
+            "scan_qr": action.scan_qr,
+            "photo": action.photo,
+            "user_id": action.user_id,
+            "concentrateur_id": action.concentrateur_id,
+            "concentrateur": None
+        }
+        
+        if action.concentrateur_id:
+            conc_result = await db.execute(
+                select(Concentrateur).where(Concentrateur.numero_serie == action.concentrateur_id)
+            )
+            concentrateur = conc_result.scalar_one_or_none()
+            if concentrateur:
+                action_dict["concentrateur"] = {
+                    "numero_serie": concentrateur.numero_serie,
+                    "modele": concentrateur.modele,
+                    "operateur": concentrateur.operateur
+                }
+        
+        actions_with_concentrateur.append(action_dict)
+    
     total_pages = (total + limit - 1) // limit if total > 0 else 1
     
     return {
-        "data": actions,
+        "data": actions_with_concentrateur,
         "total": total,
         "page": page,
         "total_pages": total_pages

@@ -25,7 +25,7 @@ export interface ApiError {
   detail: string;
 }
 
-export type ConcentrateurEtat = 'en_livraison' | 'en_stock' | 'pose' | 'retour_constructeur' | 'hs';
+export type ConcentrateurEtat = 'en_livraison' | 'en_stock' | 'pose' | 'a_tester' | 'hs';
 
 export interface Concentrateur {
   numero_serie: string;

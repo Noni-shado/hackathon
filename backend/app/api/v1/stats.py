@@ -79,7 +79,7 @@ async def get_stats_overview(
         "en_stock_magasin": en_stock_magasin,
         "en_stock_bo": en_stock_bo,
         "pose": etats.get('pose', 0),
-        "retour_constructeur": etats.get('retour_constructeur', 0),
+        "a_tester": etats.get('a_tester', 0),
         "hs": etats.get('hs', 0),
         "actions_today": actions_today,
         "total_postes": total_postes,
@@ -108,7 +108,7 @@ async def get_stocks_par_base(
             func.sum(case((Concentrateur.etat == 'en_livraison', 1), else_=0)).label('en_livraison'),
             func.sum(case((Concentrateur.etat == 'en_stock', 1), else_=0)).label('en_stock'),
             func.sum(case((Concentrateur.etat == 'pose', 1), else_=0)).label('pose'),
-            func.sum(case((Concentrateur.etat == 'retour_constructeur', 1), else_=0)).label('retour_constructeur'),
+            func.sum(case((Concentrateur.etat == 'a_tester', 1), else_=0)).label('a_tester'),
             func.sum(case((Concentrateur.etat == 'hs', 1), else_=0)).label('hs')
         )
         .where(Concentrateur.affectation.isnot(None))
@@ -125,7 +125,7 @@ async def get_stocks_par_base(
             "en_livraison": row[2] or 0,
             "en_stock": row[3] or 0,
             "pose": row[4] or 0,
-            "retour_constructeur": row[5] or 0,
+            "a_tester": row[5] or 0,
             "hs": row[6] or 0,
             "percentage": round((total / total_global) * 100, 1) if total_global > 0 else 0
         })

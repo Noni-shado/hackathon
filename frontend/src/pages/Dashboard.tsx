@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, Zap, Package, Truck, AlertTriangle, Activity } from 'lucide-react';
+import { RefreshCw, Zap, Package, Truck, AlertTriangle, Activity, FlaskConical } from 'lucide-react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { StatsCard } from '../components/dashboard/StatsCard';
 import { StockChart } from '../components/dashboard/StockChart';
@@ -115,24 +115,24 @@ export function Dashboard() {
             loading={loading}
           />
           <StatsCard
-            title="Posés"
+            title="Poses"
             value={overview?.pose ?? 0}
             icon={Activity}
             color="green"
             loading={loading}
           />
           <StatsCard
-            title="HS"
-            value={overview?.hs ?? 0}
-            icon={AlertTriangle}
-            color="red"
+            title="A tester (Labo)"
+            value={overview?.a_tester ?? 0}
+            icon={FlaskConical}
+            color="orange"
             loading={loading}
           />
           <StatsCard
-            title="Actions aujourd'hui"
-            value={overview?.actions_today ?? 0}
-            icon={RefreshCw}
-            color="gray"
+            title="HS (Rebut)"
+            value={overview?.hs ?? 0}
+            icon={AlertTriangle}
+            color="red"
             loading={loading}
           />
         </div>

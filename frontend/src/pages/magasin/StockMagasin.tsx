@@ -10,6 +10,7 @@ import {
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Button } from '../../components/common';
 import { concentrateursService } from '../../services/concentrateurs.service';
+import { magasinService, MagasinStats } from '../../services/magasin.service';
 import type { Concentrateur } from '../../types';
 import styles from './StockMagasin.module.css';
 
@@ -37,20 +38,28 @@ export function StockMagasin() {
   const [filterOperateur, setFilterOperateur] = useState('');
   const [filterEtat, setFilterEtat] = useState('');
   const [total, setTotal] = useState(0);
+  const [stats, setStats] = useState<MagasinStats | null>(null);
 
   const fetchConcentrateurs = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await concentrateursService.getConcentrateurs({
-        affectation: 'Magasin',
-        search: search || undefined,
-        operateur: filterOperateur || undefined,
-        etat: filterEtat as any || undefined,
-        limit: 100,
-      });
+      
+      // Charger les concentrateurs et les stats en parallele
+      const [response, magasinStats] = await Promise.all([
+        concentrateursService.getConcentrateurs({
+          affectation: 'Magasin',
+          search: search || undefined,
+          operateur: filterOperateur || undefined,
+          etat: filterEtat as any || undefined,
+          limit: 100,
+        }),
+        magasinService.getStats()
+      ]);
+      
       setConcentrateurs(response.data);
       setTotal(response.total);
+      setStats(magasinStats);
     } catch (err) {
       setError('Erreur lors du chargement');
       console.error(err);
@@ -88,10 +97,11 @@ export function StockMagasin() {
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
-  const stats = {
-    total: concentrateurs.length,
-    enStock: concentrateurs.filter(c => c.etat === 'en_stock').length,
-    enLivraison: concentrateurs.filter(c => c.etat === 'en_livraison').length,
+  const displayStats = {
+    total: stats?.total ?? 0,
+    enStock: stats?.en_stock ?? 0,
+    enLivraison: stats?.en_livraison ?? 0,
+    nbCartons: stats?.nb_cartons ?? 0,
   };
 
   return (
@@ -118,16 +128,20 @@ export function StockMagasin() {
 
         <div className={styles.stats}>
           <div className={styles.statCard}>
-            <span className={styles.statValue}>{stats.total}</span>
-            <span className={styles.statLabel}>Total</span>
+            <span className={styles.statValue}>{displayStats.total}</span>
+            <span className={styles.statLabel}>Total Magasin</span>
           </div>
           <div className={`${styles.statCard} ${styles.green}`}>
-            <span className={styles.statValue}>{stats.enStock}</span>
+            <span className={styles.statValue}>{displayStats.enStock}</span>
             <span className={styles.statLabel}>En stock</span>
           </div>
           <div className={`${styles.statCard} ${styles.blue}`}>
-            <span className={styles.statValue}>{stats.enLivraison}</span>
+            <span className={styles.statValue}>{displayStats.enLivraison}</span>
             <span className={styles.statLabel}>En livraison</span>
+          </div>
+          <div className={`${styles.statCard} ${styles.purple}`}>
+            <span className={styles.statValue}>{displayStats.nbCartons}</span>
+            <span className={styles.statLabel}>Cartons</span>
           </div>
         </div>
 

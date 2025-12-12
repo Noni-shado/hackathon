@@ -12,7 +12,7 @@ export function StockChart({ data, loading = false }: StockChartProps) {
       <div className={styles.container}>
         <h3 className={styles.title}>Stocks par base opérationnelle</h3>
         <div className={styles.skeletonContainer}>
-          {[1, 2, 3, 4, 5, 6].map((i) => (
+          {[1, 2, 3, 4].map((i) => (
             <div key={i} className={styles.skeletonRow}>
               <div className={styles.skeletonLabel} />
               <div className={styles.skeletonBar} />
@@ -23,41 +23,67 @@ export function StockChart({ data, loading = false }: StockChartProps) {
     );
   }
 
-  const maxTotal = Math.max(...data.map((d) => d.total), 1);
+  // Trier par total décroissant
+  const sortedData = [...data].sort((a, b) => b.total - a.total);
 
   return (
     <div className={styles.container}>
       <h3 className={styles.title}>Stocks par base opérationnelle</h3>
+      
+      {/* En-tête du tableau */}
+      <div className={styles.tableHeader}>
+        <span className={styles.headerBase}>Base</span>
+        <span className={styles.headerValue}>En stock</span>
+        <span className={styles.headerValue}>Poses</span>
+        <span className={styles.headerValue}>A tester</span>
+        <span className={styles.headerValue}>HS</span>
+        <span className={styles.headerTotal}>Total</span>
+      </div>
+      
       <div className={styles.chart}>
-        {data.map((item) => (
+        {sortedData.map((item) => (
           <div key={item.base_operationnelle} className={styles.row}>
-            <div className={styles.label}>
-              <span className={styles.baseName}>{item.base_operationnelle}</span>
-              <span className={styles.total}>{item.total}</span>
-            </div>
-            <div className={styles.barContainer}>
-              <div className={styles.barBackground}>
-                <div
-                  className={styles.barStock}
-                  style={{ width: `${(item.en_stock / maxTotal) * 100}%` }}
-                  title={`En stock: ${item.en_stock}`}
-                />
-                <div
-                  className={styles.barPose}
-                  style={{ width: `${(item.pose / maxTotal) * 100}%` }}
-                  title={`En pose: ${item.pose}`}
-                />
-                <div
-                  className={styles.barRetour}
-                  style={{ width: `${(item.retour_constructeur / maxTotal) * 100}%` }}
-                  title={`Retour: ${item.retour_constructeur}`}
-                />
-              </div>
-              <span className={styles.percentage}>{item.percentage}%</span>
-            </div>
+            <span className={styles.baseName}>{item.base_operationnelle}</span>
+            <span className={`${styles.value} ${styles.valueStock}`}>
+              {(item.en_stock ?? 0).toLocaleString('fr-FR')}
+            </span>
+            <span className={`${styles.value} ${styles.valuePose}`}>
+              {(item.pose ?? 0).toLocaleString('fr-FR')}
+            </span>
+            <span className={`${styles.value} ${styles.valueATester}`}>
+              {(item.a_tester ?? 0).toLocaleString('fr-FR')}
+            </span>
+            <span className={`${styles.value} ${styles.valueHS}`}>
+              {(item.hs ?? 0).toLocaleString('fr-FR')}
+            </span>
+            <span className={styles.total}>
+              {(item.total ?? 0).toLocaleString('fr-FR')}
+              <span className={styles.percentage}>({(item.percentage ?? 0).toFixed(1)}%)</span>
+            </span>
           </div>
         ))}
       </div>
+      
+      {/* Ligne de total */}
+      <div className={styles.totalRow}>
+        <span className={styles.totalLabel}>Total general</span>
+        <span className={`${styles.totalValue} ${styles.valueStock}`}>
+          {sortedData.reduce((sum, item) => sum + (item.en_stock ?? 0), 0).toLocaleString('fr-FR')}
+        </span>
+        <span className={`${styles.totalValue} ${styles.valuePose}`}>
+          {sortedData.reduce((sum, item) => sum + (item.pose ?? 0), 0).toLocaleString('fr-FR')}
+        </span>
+        <span className={`${styles.totalValue} ${styles.valueATester}`}>
+          {sortedData.reduce((sum, item) => sum + (item.a_tester ?? 0), 0).toLocaleString('fr-FR')}
+        </span>
+        <span className={`${styles.totalValue} ${styles.valueHS}`}>
+          {sortedData.reduce((sum, item) => sum + (item.hs ?? 0), 0).toLocaleString('fr-FR')}
+        </span>
+        <span className={styles.grandTotal}>
+          {sortedData.reduce((sum, item) => sum + (item.total ?? 0), 0).toLocaleString('fr-FR')}
+        </span>
+      </div>
+      
       <div className={styles.legend}>
         <div className={styles.legendItem}>
           <span className={`${styles.legendColor} ${styles.legendStock}`} />
@@ -65,11 +91,15 @@ export function StockChart({ data, loading = false }: StockChartProps) {
         </div>
         <div className={styles.legendItem}>
           <span className={`${styles.legendColor} ${styles.legendPose}`} />
-          <span>En pose</span>
+          <span>Poses</span>
         </div>
         <div className={styles.legendItem}>
-          <span className={`${styles.legendColor} ${styles.legendRetour}`} />
-          <span>Retour</span>
+          <span className={`${styles.legendColor} ${styles.legendATester}`} />
+          <span>A tester</span>
+        </div>
+        <div className={styles.legendItem}>
+          <span className={`${styles.legendColor} ${styles.legendHS}`} />
+          <span>HS</span>
         </div>
       </div>
     </div>

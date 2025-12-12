@@ -6,19 +6,27 @@ import styles from './Actions.module.css';
 
 const actionTypeLabels: Record<string, string> = {
   reception: 'Réception',
+  reception_magasin: 'Réception magasin',
   transfert: 'Transfert',
+  transfert_bo: 'Transfert BO',
   pose: 'Pose',
   depose: 'Dépose',
   retour_constructeur: 'Retour constructeur',
+  test_labo: 'Test labo',
+  mise_au_rebut: 'Mise au rebut',
   destruction: 'Destruction',
 };
 
 const actionTypeColors: Record<string, string> = {
   reception: 'blue',
+  reception_magasin: 'blue',
   transfert: 'orange',
+  transfert_bo: 'orange',
   pose: 'green',
   depose: 'gray',
   retour_constructeur: 'red',
+  test_labo: 'purple',
+  mise_au_rebut: 'red',
   destruction: 'red',
 };
 
@@ -100,7 +108,7 @@ export function Actions() {
         ) : (
           <div className={styles.grid}>
             {actions.map((action) => (
-              <div key={action.id} className={styles.card}>
+              <div key={action.id_action} className={styles.card}>
                 <div className={styles.cardHeader}>
                   <div className={styles.actionType}>
                     <span className={`${styles.badge} ${styles[actionTypeColors[action.type_action] || 'gray']}`}>
@@ -115,8 +123,10 @@ export function Actions() {
                     <span className={styles.label}>Concentrateur:</span>
                     {action.concentrateur ? (
                       <span className={styles.value}>
-                        <strong>{action.concentrateur.numero_serie}</strong> ({action.concentrateur.modele})
+                        <strong>{action.concentrateur.numero_serie}</strong> ({action.concentrateur.modele || 'Concentrateur IOT'})
                       </span>
+                    ) : action.concentrateur_id ? (
+                      <span className={styles.value}>{action.concentrateur_id}</span>
                     ) : (
                       <span className={styles.value}>-</span>
                     )}
@@ -124,7 +134,7 @@ export function Actions() {
                   
                   <div className={styles.infoRow}>
                     <span className={styles.label}>Base:</span>
-                    <span className={styles.value}>{action.base_operationnelle}</span>
+                    <span className={styles.value}>{action.nouvelle_affectation || action.ancienne_affectation || '-'}</span>
                   </div>
                   
                   {action.commentaire && (

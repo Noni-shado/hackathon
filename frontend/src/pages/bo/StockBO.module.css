@@ -36,7 +36,36 @@
 
 .headerActions {
   display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.boSelector {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-blue-50);
+  border: 1px solid var(--color-blue-200);
+  border-radius: 8px;
+}
+
+.boSelector svg {
+  color: var(--edf-blue);
+}
+
+.boSelect {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--edf-blue);
+  cursor: pointer;
+}
+
+.boSelect:focus {
+  outline: none;
 }
 
 .spinning {
@@ -70,6 +99,10 @@
 
 .statCard.orange {
   border-left-color: #f97316;
+}
+
+.statCard.yellow {
+  border-left-color: #eab308;
 }
 
 .statValue {

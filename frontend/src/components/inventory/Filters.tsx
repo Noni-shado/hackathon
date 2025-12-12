@@ -1,31 +1,31 @@
 import { RotateCcw } from 'lucide-react';
-import type { ConcentrateurStatut } from '../../types';
+import type { ConcentrateurEtat } from '../../types';
 import styles from './Filters.module.css';
 
 interface FiltersProps {
-  statut: ConcentrateurStatut | '';
+  statut: ConcentrateurEtat | '';
   base: string;
-  onStatutChange: (statut: ConcentrateurStatut | '') => void;
+  onStatutChange: (statut: ConcentrateurEtat | '') => void;
   onBaseChange: (base: string) => void;
   onReset: () => void;
 }
 
-const STATUTS: { value: ConcentrateurStatut | ''; label: string }[] = [
+const STATUTS: { value: ConcentrateurEtat | ''; label: string }[] = [
   { value: '', label: 'Tous les statuts' },
-  { value: 'stock', label: 'En stock' },
-  { value: 'pose', label: 'En pose' },
-  { value: 'retour_constructeur', label: 'Retour constructeur' },
-  { value: 'destruction', label: 'Destruction' },
+  { value: 'en_stock', label: 'En stock' },
+  { value: 'pose', label: 'Posé' },
+  { value: 'en_livraison', label: 'En livraison' },
+  { value: 'a_tester', label: 'À tester' },
+  { value: 'hs', label: 'HS' },
 ];
 
 const BASES = [
   { value: '', label: 'Toutes les bases' },
-  { value: 'Ajaccio', label: 'Ajaccio' },
-  { value: 'Bastia', label: 'Bastia' },
-  { value: 'Corte', label: 'Corte' },
-  { value: 'Porto-Vecchio', label: 'Porto-Vecchio' },
-  { value: 'Calvi', label: 'Calvi' },
-  { value: 'Sartène', label: 'Sartène' },
+  { value: 'Magasin', label: 'Magasin' },
+  { value: 'BO Centre', label: 'BO Centre' },
+  { value: 'BO Sud', label: 'BO Sud' },
+  { value: 'BO Nord', label: 'BO Nord' },
+  { value: 'Labo', label: 'Labo' },
 ];
 
 export function Filters({ statut, base, onStatutChange, onBaseChange, onReset }: FiltersProps) {
@@ -36,7 +36,7 @@ export function Filters({ statut, base, onStatutChange, onBaseChange, onReset }:
       <select
         className={styles.select}
         value={statut}
-        onChange={(e) => onStatutChange(e.target.value as ConcentrateurStatut | '')}
+        onChange={(e) => onStatutChange(e.target.value as ConcentrateurEtat | '')}
       >
         {STATUTS.map((s) => (
           <option key={s.value} value={s.value}>

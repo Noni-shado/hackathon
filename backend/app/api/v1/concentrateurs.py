@@ -54,6 +54,7 @@ async def get_concentrateurs(
         conditions.append(
             or_(
                 Concentrateur.numero_serie.ilike(search_pattern),
+                Concentrateur.modele.ilike(search_pattern),
                 Concentrateur.numero_carton.ilike(search_pattern),
                 Concentrateur.operateur.ilike(search_pattern)
             )
@@ -63,7 +64,7 @@ async def get_concentrateurs(
         conditions.append(Concentrateur.etat == etat)
     
     if affectation:
-        conditions.append(Concentrateur.affectation == affectation)
+        conditions.append(func.lower(Concentrateur.affectation) == func.lower(affectation))
     
     if operateur:
         conditions.append(Concentrateur.operateur == operateur)

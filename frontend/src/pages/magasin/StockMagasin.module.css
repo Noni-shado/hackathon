@@ -73,6 +73,10 @@
   border-left-color: #3b82f6;
 }
 
+.statCard.purple {
+  border-left-color: #8b5cf6;
+}
+
 .statValue {
   display: block;
   font-size: 2rem;

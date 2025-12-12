@@ -15,7 +15,10 @@ import {
   Warehouse,
   Truck,
   Building2,
-  FlaskConical
+  FlaskConical,
+  PackageCheck,
+  Send,
+  RotateCcw
 } from 'lucide-react';
 import { useState } from 'react';
 import styles from './DashboardLayout.module.css';
@@ -41,7 +44,9 @@ const magasinItems = [
 const boItems = [
   { path: '/bo/stock', label: 'Stock BO', icon: Building2 },
   { path: '/bo/pose', label: 'Pose', icon: Zap },
-  { path: '/bo/depose', label: 'Dépose', icon: Package },
+  { path: '/bo/depose', label: 'Depose', icon: RotateCcw },
+  { path: '/bo/reception', label: 'Reception', icon: PackageCheck },
+  { path: '/bo/demande', label: 'Demande transfert', icon: Send },
 ];
 
 const laboItems = [
@@ -58,7 +63,7 @@ const canAccessSection = (role: string | undefined, section: 'magasin' | 'bo' | 
     case 'magasin':
       return role === 'magasin';
     case 'bo':
-      return role === 'bo' || role === 'agent_terrain';
+      return role === 'bo' || role === 'agent_terrain' || role === 'gestionnaire';
     case 'labo':
       return role === 'labo';
     default:
