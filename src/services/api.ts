@@ -1,7 +1,8 @@
+const API_URL = import.meta.env.VITE_API_URL;
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { storageService } from './storage.service';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = API_URL;
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

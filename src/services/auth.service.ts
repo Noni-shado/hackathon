@@ -1,3 +1,4 @@
+const API_URL = import.meta.env.VITE_API_URL;
 import axios from 'axios';
 import api from './api';
 import { storageService } from './storage.service';
@@ -12,7 +13,7 @@ export const authService = {
     
     // Appel direct au backend pour éviter les problèmes de proxy
     const response = await axios.post<LoginResponse>(
-      'http://localhost:8000/api/v1/auth/login',
+      `${API_URL}/api/v1/auth/login`,
       params.toString(),
       {
         headers: {
