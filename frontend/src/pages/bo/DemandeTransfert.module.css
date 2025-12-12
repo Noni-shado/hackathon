@@ -1,0 +1,315 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  color: var(--color-gray-900);
+}
+
+.header p {
+  margin: 0;
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+}
+
+.header svg {
+  color: var(--edf-blue);
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-6);
+}
+
+.formSection,
+.historySection {
+  min-width: 0;
+}
+
+.card {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4) var(--spacing-6);
+  background: var(--color-gray-50);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.cardHeader h2 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-gray-800);
+}
+
+.cardHeader svg {
+  color: var(--edf-blue);
+}
+
+.cardBody {
+  padding: var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.field label {
+  font-weight: 500;
+  color: var(--color-gray-700);
+  font-size: var(--font-size-sm);
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: var(--spacing-3) var(--spacing-4);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  transition: border-color var(--transition-fast);
+}
+
+.quantiteSelector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.quantiteValue {
+  flex: 1;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.quantiteValue strong {
+  font-size: 1.25rem;
+  color: var(--primary-color);
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--edf-blue);
+  box-shadow: 0 0 0 3px rgba(0, 85, 164, 0.1);
+}
+
+.infoBox {
+  background: var(--color-blue-50);
+  border: 1px solid var(--color-blue-200);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-4);
+}
+
+.infoBox p {
+  margin: 0;
+  color: var(--edf-blue);
+  font-size: var(--font-size-sm);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--color-red-50);
+  border: 1px solid var(--color-red-200);
+  border-radius: var(--radius-md);
+  color: var(--color-red-700);
+  font-size: var(--font-size-sm);
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-3);
+  justify-content: flex-end;
+  margin-top: var(--spacing-2);
+}
+
+.successCard {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-8);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.successCard svg {
+  color: var(--color-green-500);
+  margin-bottom: var(--spacing-4);
+}
+
+.successCard h2 {
+  margin: 0 0 var(--spacing-2);
+  color: var(--color-gray-900);
+}
+
+.successCard > p {
+  margin: 0 0 var(--spacing-6);
+  color: var(--color-gray-600);
+}
+
+.successDetails {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-md);
+}
+
+.successDetails > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.label {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  text-transform: uppercase;
+}
+
+.value {
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+
+.loading,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-8);
+  color: var(--color-gray-500);
+}
+
+.demandesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.demandeItem {
+  padding: var(--spacing-4);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-gray-200);
+}
+
+.demandeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-2);
+}
+
+.demandeId {
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+
+.demandeStatut {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.demandeStatut.en_attente {
+  background: var(--color-yellow-100);
+  color: var(--color-yellow-800);
+}
+
+.demandeStatut.validee {
+  background: var(--color-blue-100);
+  color: var(--color-blue-800);
+}
+
+.demandeStatut.en_livraison {
+  background: var(--color-purple-100);
+  color: var(--color-purple-800);
+}
+
+.demandeStatut.livree {
+  background: var(--color-green-100);
+  color: var(--color-green-800);
+}
+
+.demandeStatut.annulee {
+  background: var(--color-red-100);
+  color: var(--color-red-800);
+}
+
+.demandeDetails {
+  display: flex;
+  gap: var(--spacing-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  margin-bottom: var(--spacing-2);
+}
+
+.demandeDate {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 900px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+  
+  .successDetails {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .actions {
+    flex-direction: column;
+  }
+  
+  .actions button {
+    width: 100%;
+  }
+}

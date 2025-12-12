@@ -1,0 +1,174 @@
+# EDF Corse - Gestion Concentrateurs CPL
+
+Application de gestion du cycle de vie des concentrateurs CPL pour EDF Corse.
+
+## Stack Technique
+
+### Backend
+- **Framework:** FastAPI (Python 3.11+)
+- **ORM:** SQLAlchemy 2.0
+- **Base de données:** PostgreSQL + asyncpg
+- **Auth:** JWT (python-jose) + Passlib (bcrypt)
+
+### Frontend
+- **Framework:** React 18 + TypeScript
+- **Build:** Vite
+- **Routing:** React Router DOM
+- **HTTP Client:** Axios
+- **Icons:** Lucide React
+- **Maps:** Leaflet + React-Leaflet
+- **QR Code:** html5-qrcode
+- **PWA:** vite-plugin-pwa
+
+## Prérequis
+
+- Python 3.11+
+- Node.js 18+
+- PostgreSQL 15+
+
+## Installation
+
+### 1. Backend
+
+```bash
+cd backend
+
+# Créer un environnement virtuel
+python -m venv venv
+
+# Activer l'environnement virtuel
+# Windows
+venv\Scripts\activate
+# Linux/Mac
+source venv/bin/activate
+
+# Installer les dépendances
+pip install -r requirements.txt
+```
+
+### 2. Configuration Backend
+
+Créer un fichier `.env` dans le dossier `backend/` :
+
+```env
+# Base de données
+DATABASE_URL=
+
+# JWT
+SECRET_KEY=your-secret-key-here
+ALGORITHM=
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Frontend URL (CORS)
+FRONTEND_URL=
+```
+
+### 3. Frontend
+
+```bash
+cd frontend
+
+# Installer les dépendances
+npm install
+```
+
+## Lancement
+
+### Backend
+
+```bash
+cd backend
+
+# Activer l'environnement virtuel si pas déjà fait
+# Windows
+venv\Scripts\activate
+# Linux/Mac
+source venv/bin/activate
+
+# Lancer le serveur
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+L'API sera accessible sur : http://localhost:8000
+
+- Documentation Swagger : http://localhost:8000/docs
+- Documentation ReDoc : http://localhost:8000/redoc
+
+### Frontend
+
+```bash
+cd frontend
+
+# Lancer le serveur de développement
+npm run dev
+```
+
+L'application sera accessible sur : http://localhost:5173
+
+## Structure du Projet
+
+```
+Code/
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── v1/           # Endpoints API
+│   │   │       ├── auth.py
+│   │   │       ├── concentrateurs.py
+│   │   │       ├── actions.py
+│   │   │       ├── transferts.py
+│   │   │       ├── stats.py
+│   │   │       ├── labo.py
+│   │   │       └── magasin.py
+│   │   ├── core/             # Configuration
+│   │   ├── models/           # Modèles SQLAlchemy
+│   │   ├── schemas/          # Schémas Pydantic
+│   │   └── main.py
+│   ├── scripts/              # Scripts utilitaires
+│   ├── requirements.txt
+│   └── .env
+│
+└── frontend/
+    ├── src/
+    │   ├── components/       # Composants React
+    │   ├── pages/            # Pages de l'application
+    │   ├── services/         # Services API
+    │   ├── contexts/         # Contextes React
+    │   ├── hooks/            # Hooks personnalisés
+    │   ├── types/            # Types TypeScript
+    │   ├── styles/           # Styles CSS
+    │   └── App.tsx
+    ├── public/
+    ├── package.json
+    └── vite.config.ts
+```
+
+## API Endpoints
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| POST | `/api/v1/auth/login` | Authentification |
+| GET | `/api/v1/concentrateurs` | Liste des concentrateurs |
+| GET | `/api/v1/concentrateurs/{id}` | Détail d'un concentrateur |
+| POST | `/api/v1/actions` | Créer une action |
+| GET | `/api/v1/transferts` | Liste des transferts |
+| GET | `/api/v1/stats` | Statistiques |
+| GET | `/api/v1/labo` | Gestion laboratoire |
+| GET | `/api/v1/magasin` | Gestion magasin |
+
+## Build Production
+
+### Frontend
+
+```bash
+cd frontend
+npm run build
+```
+
+Les fichiers de production seront générés dans `frontend/dist/`.
+
+## Hackathon EDF Corse
+
+**Dates:** 11-12 décembre 2025  
+**Lieu:** Université de Corse, Campus Grimaldi, Corte  
+**Sujet:** Application de gestion du cycle de vie des concentrateurs CPL (~6000 équipements en Corse)

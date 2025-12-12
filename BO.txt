@@ -1,0 +1,112 @@
+BO
+
+***********Affichage*************
+
+FONCTIONNALITÉ : Voir le stock local de la BO
+---
+TABLEAU DE BORD :
+* Total concentrateurs affectés à la BO
+* En stock : X unités
+* Posés : Y unités ok
+---
+ACTIONS :
+- Voir détail par numéro de série
+- Historique des mouvements
+- Statistiques d'utilisation
+---
+ACCÈS : Page "Stock BO"
+
+*****Carte geographique ****************
+
+5. CONSULTATION DES POSTES
+text
+FONCTIONNALITÉ : Voir la carte des postes de la région
+---
+AFFICHAGE :
+* Carte interactive avec icônes
+* Postes avec concentrateur : ✅
+* Etat des concentrateur : (couleur par statut)
+
+---
+INFORMATIONS PAR POSTE :
+- Code et nom
+- Dernière intervention
+- Historique des postes
+---
+ACCÈS : Page "Carte des Postes"
+
+
+
+
+**********Formulaires************
+FONCTIONNALITÉ : Commander de nouveaux concentrateurs
+---
+FORMULAIRE :
+- Quantité souhaitée (1-20)
+- Opérateur préféré
+- Date souhaitée
+- Commentaire optionnel
+---
+WORKFLOW :
+1. Création commande → Statut "En attente"
+2. Notification magasin pour préparation
+---
+ACCÈS : Page "Nouvelle Commande"
+
+******************************
+3. POSE DE CONCENTRATEURS
+text
+FONCTIONNALITÉ : Installer un concentrateur sur un poste
+---
+WORKFLOW :
+1. Scanner le concentrateur
+2. Vérifier disponibilité (état = "En stock")
+3. Choisir poste dans la liste (filtrée par BO)
+4. Saisir informations complémentaires
+5. Prendre photo optionnelle
+valider
+---
+RÉSULTAT :
+* État : "En stock" → "Posé"
+* Poste_pose : renseigné
+* Date_pose : enregistrée
+* Historique créé
+---
+ACCÈS : Page "Pose"
+**************** Formulaire***************
+4. DÉPOSE DE CONCENTRATEURS
+text
+FONCTIONNALITÉ : Retirer un concentrateur défectueux---
+WORKFLOW :
+OPTION A - Recherche par poste :
+1. Sélectionner poste dans liste
+2. Voir concentrateur posé
+3. Confirmer dépose
+---
+RÉSULTAT :
+* État : "Posé" → "À tester"
+* Affectation : [BO] → "Labo"
+* Poste_pose : vidé
+* Historique créé + Notification labo
+---
+ACCÈS : Page "Dépose"
+
+
+
+FONCTIONNALITÉ : Saisir les rapports d'intervention
+---
+FORMULAIRE :
+- Date et heure intervention
+- Technicien(s) présent(s)
+- Type d'intervention
+- Observations
+- Photos
+
+---
+LIEN AVEC CONCENTRATEURS :
+- Association avec concentrateur(s) concerné(s)
+- Historique lié aux actions
+---
+ACCÈS : Page "Rapports"
+
+

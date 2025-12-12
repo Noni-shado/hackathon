@@ -1,0 +1,59 @@
+LABO
+*****Affichage*********
+
+1. FILE D'ATTENTE DES TESTS
+text
+FONCTIONNALITÉ : Voir les concentrateurs à tester
+---
+LISTE TRIÉE PAR :
+* Priorité (urgence)
+* Date de dépose (ancienneté)
+* BO d'origine
+* Type de panne suspectée
+---
+INFORMATIONS :
+- Numéro série
+- BO d'origine
+- Date dépose
+- Poste d'origine
+- Technicien ayant effectué la dépose
+- Commentaire dépose
+---
+ACCÈS : Page "À tester"
+
+
+FONCTIONNALITÉ : Suivre les performances du labo
+---
+INDICATEURS :
+* Taux de réparation (réussite/échec)
+* Causes principales de pannes
+* Performances par modèle
+---
+
+ACCÈS : Page "Statistiques Labo"
+
+
+
+FONCTIONNALITÉ : Effectuer les tests de diagnostic
+---
+WORKFLOW :4444
+1. Sélectionner concentrateur dans la file
+2. Scanner pour confirmation/ saisi e code barre
+3- faire les tests 
+4- renseigner date
+5- renseigner une photo du consontrateur
+
+6. Déterminer résultat :
+   ╠═► RÉPARABLE 
+   ╚═►  HS
+7. Commentaire detail 
+8. apres validation ---> generer un rapport 
+
+Resultat:
+affectation : labo-> magasin 
+notif-> magasin 
+---
+ACCÈS : Page "Test"
+
+
+

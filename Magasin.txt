@@ -1,0 +1,56 @@
+
+
+
+Magasin
+
+Affichage
+
+ACTIONS :
+- Voir liste des concentrateurs en stock
+- Filtrer par opérateur/date/modèle
+- Rechercher par numéro de série
+- Exporter liste en CSV
+
+INFORMATIONS AFFICHÉES :
+* Numéro série • Modèle • Date fabrication
+* Opérateur • Date réception • État
+
+Notifs (si ya une demande est receve par les labos)
+ACCÈS : Page "Stock Magasin"
+
+
+
+
+**************Formulaire(concerne BO)*********************8
+
+FONCTIONNALITÉ : Préparer les livraisons pour les BO
+---
+SCÉNARIO :
+1. Sélectionner une BO destination
+2. Scanner les concentrateurs à transférer
+3. Générer bon de transfert
+4. Valider l'envoi
+---
+RÉSULTAT :
+* Affectation changée : Magasin → [BO]
+* État reste "En stock"
+* Notification à la BO concernée
+---
+ACCÈS : Page "Transferts"
+
+
+
+FONCTIONNALITÉ : Scanner les cartons fournisseurs
+---
+ACTION : 
+- Scan du numéro de carton
+- Saisie de l'opérateur (Bouygues/Orange/SFR)
+- Validation automatique création des concentrateurs
+---
+RÉSULTAT :
+* Concentrateurs créés avec état "En livraison" → "En stock"
+* Affectation automatique : "Magasin"
+* Historique enregistré
+* Notification admin
+---
+ACCÈS : Page "Réception"
